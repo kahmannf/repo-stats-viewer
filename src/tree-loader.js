@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-unused-vars
+const GitRunner = require("./git-runner")
 
 /**
  * 

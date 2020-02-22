@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-unused-vars
+const FileInfo = require("./file-info")
 
 class FileTree {
   /**
@@ -12,7 +14,11 @@ class FileTree {
   ) {
     this.name = name
     this.subTrees = subTrees
+    subTrees.forEach(x => x.parent = this)
     this.files = files
+    files.forEach(x => x.parent = this)
+    /** @type {FileTree} */
+    this.parent = undefined
   }
 }
 
