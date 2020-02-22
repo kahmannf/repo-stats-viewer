@@ -1,0 +1,11 @@
+{
+  "name": "git-visualizer",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "author": "Felix Kahmann <felix@kahmann.de>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
