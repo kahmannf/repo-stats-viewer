@@ -1,5 +1,5 @@
-const express = require('express')
-const routes = require('./routes')
+const express = require("express")
+const routes = require("./routes")
 
 /**
  * 
@@ -10,7 +10,7 @@ function server(config) {
   const app = express()
 
   app.use(routes())
-  app.use(express.static(__dirname + '/public'))
+  app.use(express.static(__dirname + "/public"))
 
   app.listen(config.port, () => {
     console.log(`Listening on http://localhost:${config.port}`)
