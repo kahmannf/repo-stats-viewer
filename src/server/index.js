@@ -1,5 +1,6 @@
 const express = require("express")
 const routes = require("./routes")
+const GitRunner = require("../git-runner")
 
 /**
  * 
@@ -9,7 +10,9 @@ function server(config) {
 
   const app = express()
 
-  app.use(routes())
+  const gitRunner = new GitRunner(".")
+
+  app.use(routes(gitRunner))
   app.use(express.static(__dirname + "/public"))
 
   app.listen(config.port, () => {

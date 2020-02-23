@@ -24,7 +24,7 @@ class CommitHistory {
     this.commits[this.initlaCommit.id] = new HistoryCommit(this.initlaCommit, currentMaxBranch)
 
     /** @type {(CommitStep|MergeStep)[]} */
-    this.reproductionSteps = [new CommitStep(this.initlaCommit.id, currentMaxBranch)]
+    this.reproductionSteps = [new CommitStep(this.initlaCommit.id, currentMaxBranch, this.initlaCommit.message, undefined)]
     let topLevelSteps = [...this.reproductionSteps]
     commits.splice(commits.findIndex(x => x === this.initlaCommit), 1)
 
@@ -41,7 +41,7 @@ class CommitHistory {
       
       if (child.parents.length === 1) {
         const branch = hastChildrenMap[ancestor.id] ? ++currentMaxBranch : ancestor.branch
-        const next = new CommitStep(child.id, branch)
+        const next = new CommitStep(child.id, branch, child.message, ancestor.branch)
         this.reproductionSteps.push(next)
         topLevelSteps.push(next)
         this.commits[child.id] = new HistoryCommit(child, next.branch)
@@ -52,7 +52,7 @@ class CommitHistory {
         const parents = child.parents.map(x => this.commits[x]).filter(x => x)
         const map = {}
         parents.forEach(x => map[x.id] = x.branch)
-        const next = new MergeStep(child.id, map)
+        const next = new MergeStep(child.id, map, child.message)
         this.reproductionSteps.push(next)
         topLevelSteps.push(next)
         this.commits[child.id] = new HistoryCommit(child, next.branch)
@@ -74,12 +74,16 @@ class CommitStep {
   /**
    * 
    * @param {string} id 
-   * @param {number} branch 
+   * @param {number} branch
+   * @param {string} message
+   * @param {number} parentBranch
    */
-  constructor(id, branch) {
+  constructor(id, branch, message, parentBranch) {
     this.id = id
     this.branch = branch
-    this.type = "commit"
+    this.type = "commit",
+    this.message = message
+    this.parentBranch = parentBranch
   }
 }
 
@@ -88,8 +92,9 @@ class MergeStep {
    * 
    * @param {string} id 
    * @param {{ [parentId: string]: number }} parentBranchMap 
+   * @param {string} message
    */
-  constructor(id, parentBranchMap) {
+  constructor(id, parentBranchMap, message) {
     this.id = id
     this.parentBranchMap = parentBranchMap
     this.parents = Object.keys(parentBranchMap)
@@ -97,6 +102,7 @@ class MergeStep {
     // Expecting to lowest branch-number to win
     this.branch = Math.min(...this.branches)
     this.type = "merge"
+    this.message = message
   }
 }
 

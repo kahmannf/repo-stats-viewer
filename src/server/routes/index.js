@@ -1,7 +1,11 @@
 const express = require("express")
 
-function routes() {
+const history = require("./history")
+
+function routes(gitRunner) {
   const router = express.Router()
+
+  router.use("/history", history(gitRunner))
 
   return router
 }
