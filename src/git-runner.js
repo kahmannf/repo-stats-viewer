@@ -4,6 +4,7 @@ const splitSort = require("./utils/split-sort")
 const FileTree = require("./model/file-tree")
 const FileInfo = require("./model/file-info")
 const Commit = require("./model/commit")
+const CommitHistory = require("./model/commit-history")
 
 class GitRunner {
 
@@ -26,7 +27,8 @@ class GitRunner {
   runGit(commands, trimWhitespace = true) {
     return new Promise((resolve, reject) => {
       exec("git " + commands.join(" "), {
-        cwd: this.repo
+        cwd: this.repo,
+        maxBuffer: 1024 * 1024 * 500
       }, (err, stdout) => {
         if (err) {
           reject(err)
@@ -124,8 +126,16 @@ class GitRunner {
    */
   async getCommit(ref) {
     const text = await this.prettyCat(ref)
-    return Commit.parse(ref, text) 
-  } 
+    return Commit.parseCatFile(ref, text) 
+  }
+  
+  async getHistory(ref) {
+    const text = await this.runGit([ "log", "--format=\"hash=%H;tree=%T;parents=%P;author=%an;committer=%cn;timestamp=%ct;subject=%s\"", ref ])
+
+    const commits = text.split("\n").map(line => Commit.parseLogHistory(line))
+
+    return new CommitHistory(commits)
+  }
 }
 
 module.exports = GitRunner

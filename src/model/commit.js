@@ -8,6 +8,7 @@ class Commit {
    * @param {string} author 
    * @param {string} committer 
    * @param {string} message
+   * @param {number} commitUnixTimestamp
    */
   constructor(
     id,
@@ -15,7 +16,8 @@ class Commit {
     parents,
     author,
     committer,
-    message
+    message,
+    commitUnixTimestamp
   ) {
     this.id = id,
     this.tree = tree,
@@ -23,6 +25,7 @@ class Commit {
     this.author = author,
     this.committer = committer
     this.message = message
+    this.commitUnixTimestamp = commitUnixTimestamp
   }
 }
 
@@ -31,7 +34,7 @@ class Commit {
  * @param {string} catFileOutput
  * @returns {Commit}
  */
-Commit.parse = function (commitId, catFileOutput) {
+Commit.parseCatFile = function (commitId, catFileOutput) {
   const lines = catFileOutput.split("\n")
   
   let run = true, tree, parents = [], author, comitter, message
@@ -66,6 +69,24 @@ Commit.parse = function (commitId, catFileOutput) {
     author,
     comitter,
     message
+  )
+}
+
+/**
+ * 
+ * @param {string} historyLine
+ */
+Commit.parseLogHistory= function(historyLine) {
+  const [hashSplit,treeSplit,parentsSplit,authorSplit,committerSplit,timestampSplit,subjectSplit] = historyLine.split(";").map(x => x.split("="))
+
+  return new Commit(
+    hashSplit[1],
+    treeSplit[1],
+    parentsSplit[1].split(" ").filter(x => typeof x === "string" && x.length > 0),
+    authorSplit[1],
+    committerSplit[1],
+    subjectSplit[1],
+    parseInt(timestampSplit[1], 10)
   )
 }
 
